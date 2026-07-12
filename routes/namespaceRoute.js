@@ -1,5 +1,5 @@
 import express from "express";
-import NamespaceController from "../controllers/namespaceController";
+import NamespaceController from "../controllers/namespaceController.js";
 
 const router = express.Router();
 

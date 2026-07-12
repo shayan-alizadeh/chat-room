@@ -1,17 +1,17 @@
-import { namespaceModel } from "../models/chatModel";
+import { namespaceModel } from "../models/chatModel.js";
 export default class NamespaceController {
-  async getAll(req, res, next) {
+  static async getAll(req, res, next) {
     try {
-      const namespace = namespaceModel.find({}, { room: 0 });
+      const namespace = await namespaceModel.find({}, { room: 0 });
       return res.status(200).json(namespace);
     } catch (err) {
       next(err);
     }
   }
-  async create(req, res, next) {
+  static async create(req, res, next) {
     try {
       const { title, href } = req.body;
-      const namespace = namespaceModel.findOne({ $or: [{ title }, { href }] });
+      const namespace = await namespaceModel.findOne({ $or: [{ title }, { href }] });
 
       if (namespace)
         return res.status(400).json({ message: "There is Namespace with this info !!" });
