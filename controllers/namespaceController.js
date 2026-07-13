@@ -26,16 +26,18 @@ export default class NamespaceController {
 
   static async createRoom(req, res, next) {
     try {
-      const { title, namespace } = req.body;
-      const mainNamespace = await namespaceModel.findOne({ title: namespace });
+      const { title, namespace_href } = req.body;
+      const mainNamespace = await namespaceModel.findOne({ href: namespace_href });
 
       if (!mainNamespace) return res.status(400).json({ message: "Namespace not found !!" });
 
+      const mainRoom = await namespaceModel.findOne({ "rooms.title": title });
+      if (mainRoom) return res.status(400).json({ message: "Room already exist !!" });
 
-      const room = {title , image = "Test IMG"};
-    
+      const room = { title, image: "Test IMG" };
+
       await namespaceModel.findOneAndUpdate(
-        { title: namespace },
+        { href: namespace_href },
         {
           $push: {
             rooms: room,
