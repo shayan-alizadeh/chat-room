@@ -23,4 +23,29 @@ export default class NamespaceController {
       next(err);
     }
   }
+
+  static async createRoom(req, res, next) {
+    try {
+      const { title, namespace } = req.body;
+      const mainNamespace = await namespaceModel.findOne({ title: namespace });
+
+      if (!mainNamespace) return res.status(400).json({ message: "Namespace not found !!" });
+
+
+      const room = {title , image = "Test IMG"};
+    
+      await namespaceModel.findOneAndUpdate(
+        { title: namespace },
+        {
+          $push: {
+            rooms: room,
+          },
+        },
+      );
+
+      return res.status(201).json({ message: "New room created successfully" });
+    } catch (err) {
+      next(err);
+    }
+  }
 }
