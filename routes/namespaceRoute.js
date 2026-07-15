@@ -1,6 +1,6 @@
 import express from "express";
 import NamespaceController from "../controllers/namespaceController.js";
-import { multerStorage } from "../middleware/multer.js";
+import { multerStorage } from "../middlewares/multer.js";
 
 const router = express.Router();
 

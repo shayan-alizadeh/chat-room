@@ -27,6 +27,8 @@ export default class NamespaceController {
   static async createRoom(req, res, next) {
     try {
       const { title, namespace_href } = req.body;
+      let image = null;
+
       const mainNamespace = await namespaceModel.findOne({ href: namespace_href });
 
       if (!mainNamespace) return res.status(400).json({ message: "Namespace not found !!" });
@@ -34,7 +36,11 @@ export default class NamespaceController {
       const mainRoom = await namespaceModel.findOne({ "rooms.title": title });
       if (mainRoom) return res.status(400).json({ message: "Room already exist !!" });
 
-      const room = { title, image: "Test IMG" };
+      if (req.file) {
+        image = `rooms/${req.file.filename}`;
+      }
+
+      const room = { title, image : image ? image : undefined };
 
       await namespaceModel.findOneAndUpdate(
         { href: namespace_href },
