@@ -1,10 +1,13 @@
 import express from "express";
 import NamespaceController from "../controllers/namespaceController.js";
+import { multerStorage } from "../middleware/multer.js";
 
 const router = express.Router();
 
-router.get('/',NamespaceController.getAll)
-router.post('/',NamespaceController.create)
-router.post("/room", NamespaceController.createRoom);
+const uploader = multerStorage("public/rooms");
+
+router.get("/", NamespaceController.getAll);
+router.post("/", NamespaceController.create);
+router.post("/room",uploader.single("media") ,NamespaceController.createRoom);
 
 export default router;

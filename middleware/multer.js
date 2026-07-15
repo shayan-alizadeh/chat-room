@@ -30,5 +30,5 @@ export function multerStorage(destination, allowTypes = /jpg|jpeg|png/) {
     fileFilter,
   });
 
-  return upload()
+  return upload;
 }
