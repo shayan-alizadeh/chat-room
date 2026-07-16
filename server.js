@@ -1,6 +1,9 @@
-import  app  from "./app.js";
+import http from "http";
+import app from "./app.js";
+import { Server } from "socket.io";
 import mongoose from "mongoose";
 import "dotenv/config";
+import initConnection from "./socket.io/namespace.socket.js";
 
 async function connectToDB() {
   try {
@@ -14,7 +17,10 @@ async function connectToDB() {
 
 async function startServer() {
   const port = process.env.PORT;
-  app.listen(port, () => {
+  const server = http.createServer(app);
+  const io = new Server(server, { cors: { origin: "*" } });
+  initConnection(io);
+  server.listen(port, () => {
     console.log(`Server Running on port : ${port}`);
   });
 }

@@ -45,4 +45,4 @@ const namespaceSchema = mongoose.Schema({
   },
 });
 
-export const namespaceModel = mongoose.model("Namespace", namespaceSchema);
+export const NamespaceModel = mongoose.model("Namespace", namespaceSchema);
