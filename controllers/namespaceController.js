@@ -40,7 +40,7 @@ export default class NamespaceController {
         image = `rooms/${req.file.filename}`;
       }
 
-      const room = { title, image : image ? image : undefined };
+      const room = { title, image: image ? image : undefined };
 
       await namespaceModel.findOneAndUpdate(
         { href: namespace_href },

@@ -22,7 +22,6 @@ const roomSchema = mongoose.Schema(
     },
     image: {
       type: String,
-      required: true,
     },
     messsages: {
       type: [messageSchema],
