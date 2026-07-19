@@ -14,16 +14,31 @@ export async function getNamespaceRoom(io) {
 
   namespaces.forEach((namespace) => {
     io.of(namespace.href).on("connection", (socket) => {
+      //single room - support chat
+      // socket.on("joining",asyn (newRoom) => {
+      //   const lastRoom = Array.from(socket.rooms)[1];
+      //   if(lastRoom){
+      //     socket.leave(lastRoom)
+      //   }
+      //   socket.join(newRoom)
+
+      //   const roomInfo = namespace.rooms.find((room) => {
+      //     room.title === newRoom;
+      //   });
+      //   socket.emit("roomInfo", roomInfo);
+      // })
+
+      //multi room - chat room
+      const mainNamespace = await NamespaceModel.findOne({_id : namespace._id})
+      socket.emit("namespaceRoom", mainNamespace.rooms);
       socket.on("joining", async (newRoom) => {
         socket.join(newRoom);
 
-        const roomInfo = namespace.rooms.find((room) => {
+        const roomInfo = mainNamespace.rooms.find((room) => {
           room.title === newRoom;
         });
         socket.emit("roomInfo", roomInfo);
       });
-
-      socket.emit("namespaceRoom", namespace.rooms);
     });
   });
 }
