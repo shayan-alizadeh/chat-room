@@ -41,4 +41,9 @@ export async function getNamespaceRoom(io) {
       });
     });
   });
+
+  export async function getOnlineUsersRoom(io,href,rommName){
+    const onlineUsers = await io.of(href).in(rommName).allSockets()
+    io.of(href).in(rommName).emit("onlineUsersCount", Array.from(onlineUsers).length)
+  }
 }
