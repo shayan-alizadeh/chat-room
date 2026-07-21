@@ -14,36 +14,67 @@ export async function getNamespaceRoom(io) {
 
   namespaces.forEach((namespace) => {
     io.of(namespace.href).on("connection", (socket) => {
-      //single room - support chat
-      // socket.on("joining",asyn (newRoom) => {
-      //   const lastRoom = Array.from(socket.rooms)[1];
-      //   if(lastRoom){
-      //     socket.leave(lastRoom)
-      //   }
-      //   socket.join(newRoom)
+      // single room - support chat
+      socket.on("joining", async (newRoom) => {
+        const lastRoom = Array.from(socket.rooms)[1];
+        if (lastRoom) {
+          socket.leave(lastRoom);
+          await getRoomOnlineUsers(io, namespace.href, lastRoom);
+        }
+        socket.join(newRoom);
+        await getRoomOnlineUsers(io, namespace.href, newRoom);
 
-      //   const roomInfo = namespace.rooms.find((room) => {
+        const roomInfo = namespace.rooms.find((room) => {
+          return room.title === newRoom;
+        });
+        socket.emit("roomInfo", roomInfo);
+
+        await getMessage(socket);
+
+        socket.on("disconnect", async () => {
+          await getRoomOnlineUsers(io, namespace.href, newRoom);
+        });
+      });
+
+      //multi room - chat room
+      // const mainNamespace = await NamespaceModel.findOne({_id : namespace._id})
+      // socket.emit("namespaceRoom", mainNamespace.rooms);
+      // socket.on("joining", async (newRoom) => {
+      //   socket.join(newRoom);
+      //   await getRoomOnlineUsers(io,mainNamespace.href,newRoom)
+      //
+      //   const roomInfo = mainNamespace.rooms.find((room) => {
       //     room.title === newRoom;
       //   });
       //   socket.emit("roomInfo", roomInfo);
-      // })
-
-      //multi room - chat room
-      const mainNamespace = await NamespaceModel.findOne({_id : namespace._id})
-      socket.emit("namespaceRoom", mainNamespace.rooms);
-      socket.on("joining", async (newRoom) => {
-        socket.join(newRoom);
-
-        const roomInfo = mainNamespace.rooms.find((room) => {
-          room.title === newRoom;
-        });
-        socket.emit("roomInfo", roomInfo);
-      });
+      //   socket.on("disconnect", async ()=>{
+      //     await getRoomOnlineUsers(io,mainNamespace.href,newRoom)
+      //   })
+      // });
     });
   });
+}
 
-  export async function getOnlineUsersRoom(io,href,rommName){
-    const onlineUsers = await io.of(href).in(rommName).allSockets()
-    io.of(href).in(rommName).emit("onlineUsersCount", Array.from(onlineUsers).length)
-  }
+export async function getMessage(socket) {
+  socket.on("newMsg", async (data) => {
+    const { message, roomName } = data;
+    const namespace = await NamespaceModel.findOne({ "rooms.title": roomName });
+
+    await NamespaceModel.updateOne(
+      { _id: namespace._id, "rooms.title": roomName },
+      {
+        $push: {
+          "rooms.$.messages": {
+            sender: "57d7a121fa937f710a7d486f",
+            message,
+          },
+        },
+      },
+    );
+  });
+}
+
+export async function getRoomOnlineUsers(io, href, roomName) {
+  const onlineUsers = await io.of(href).in(roomName).allSockets();
+  io.of(href).in(roomName).emit("onlineUsersCount", Array.from(onlineUsers).length);
 }

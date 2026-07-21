@@ -23,7 +23,7 @@ const roomSchema = mongoose.Schema(
     image: {
       type: String,
     },
-    messsages: {
+    messages: {
       type: [messageSchema],
       default: [],
     },
