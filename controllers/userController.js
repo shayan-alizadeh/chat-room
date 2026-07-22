@@ -32,8 +32,23 @@ export class UserController {
       next(err);
     }
   }
-  static login(req, res, next) {
+  static async me(req, res, next) {
     try {
+      //Bearer <Token>
+      const authorization = req.headers["authorization"].split(" ")[1];
+
+      if (authorization) {
+        const payload = jwt.decode(authorization);
+        const user = await mongoose.findOne({ _id: payload._id });
+
+        if (user) {
+          return res.status(200).json(user);
+        } else {
+          return res.status(404).json(user);
+        }
+      } else {
+        return res.status(404).json(null);
+      }
     } catch (err) {
       next(err);
     }
