@@ -8,6 +8,6 @@ const uploader = multerStorage("public/rooms");
 
 router.get("/", NamespaceController.getAll);
 router.post("/", NamespaceController.create);
-router.post("/room",uploader.single("media") ,NamespaceController.createRoom);
+router.post("/room", uploader.single("media"), NamespaceController.createRoom);
 
 export default router;
