@@ -1,4 +1,5 @@
 import { NamespaceModel } from "../models/chatModel";
+import { UserModel } from "../models/userModel";
 import path from "path"
 import fs from "fs"
 
@@ -81,6 +82,16 @@ export async function getMessage(io, socket) {
     );
     io.of(namespace.href).in(roomName).emit("confirmMsg", data);
   });
+  detectIsTyping(io,socket)
+}
+
+export async function detectIsTyping(io,socket){
+  socket.io("isTyping",(data)=>{
+    const {userID,roomName,isTyping} = data;
+    const namespace = await NamespaceModel.findOne({"rooms.title":roomName})
+
+    io.of(namespace.href).in(roomName).emit("isTyping",{isTyping,username})
+  })
 }
 
 export async function getRoomOnlineUsers(io, href, roomName) {
@@ -114,6 +125,25 @@ export async function getLocation(io, socket) {
 export async function getMedia(io,socket){
   socket.on("newMedia",(data)=>{
     const {filename,file,sender,roomName} = data;
+
+    const ext = path.extname(filename);
+    const mediaPath = `uploads/${String(Date.now() + ext)}`
+
+    fs.writeFile(`public/${mediaPath}`,file,(err)=>{
+      if(!err){
+
+        await NamespaceModel.updateOne({_id: namespace._id, "rooms.title": roomName},{
+          $push : {
+            "rooms.$.media":{
+              sender,
+              path: mediaPath
+            }
+          }
+        })
+
+        io.of(namespace.href).in(roomName).emit("confirmMedia",data)
+      }
+    })
 
     const namespace = await NamespaceModel.findOne({"rooms.title":roomName})
   })

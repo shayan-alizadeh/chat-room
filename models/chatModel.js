@@ -22,12 +22,27 @@ const locationSchema = mongoose.Schema(
       ref: "User",
       required: true,
     },
-    x : {
+    x: {
       type: Number,
       required: true,
     },
-    y : {
+    y: {
       type: Number,
+      required: true,
+    },
+  },
+  { timestamps: true },
+);
+
+const mediaSchema = mongoose.Schema(
+  {
+    sender: {
+      type: mongoose.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    path: {
+      type: String,
       required: true,
     },
   },
@@ -49,6 +64,10 @@ const roomSchema = mongoose.Schema(
     },
     location: {
       type: [locationSchema],
+      default: [],
+    },
+    media: {
+      type: [mediaSchema],
       default: [],
     },
   },
