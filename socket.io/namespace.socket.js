@@ -1,4 +1,6 @@
 import { NamespaceModel } from "../models/chatModel";
+import path from "path"
+import fs from "fs"
 
 export function initConnection(io) {
   io.on("connection", async (socket) => {
@@ -93,5 +95,26 @@ export async function getLocation(io, socket) {
 
   const namespace = await NamespaceModel.findOne({ "rooms.title": roomName });
 
+  await NamespaceModel.updateOne(
+    { _id: namespace._id, "rooms.title": roomName },
+    {
+      $push: {
+        "rooms.$.location": {
+          sender,
+          x: location.x,
+          y: location.y,
+        },
+      },
+    },
+  );
+
   io.of(namespace.href).in(roomName).emit("confirmLocation", data);
+}
+
+export async function getMedia(io,socket){
+  socket.on("newMedia",(data)=>{
+    const {filename,file,sender,roomName} = data;
+
+    const namespace = await NamespaceModel.findOne({"rooms.title":roomName})
+  })
 }
