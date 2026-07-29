@@ -1,7 +1,7 @@
 import { NamespaceModel } from "../models/chatModel.js";
 import { UserModel } from "../models/userModel.js";
-import path from "path"
-import fs from "fs"
+import path from "path";
+import fs from "fs";
 
 export function initConnection(io) {
   io.on("connection", async (socket) => {
@@ -82,17 +82,21 @@ export async function getMessage(io, socket) {
     );
     io.of(namespace.href).in(roomName).emit("confirmMsg", data);
   });
-  detectIsTyping(io,socket)
+  detectIsTyping(io, socket);
 }
 
-export async function detectIsTyping(io,socket){
-  socket.io("isTyping", async (data)=>{
-    const {userID,roomName,isTyping} = data;
-    const namespace = await NamespaceModel.findOne({"rooms.title":roomName})
-    const user = await UserModel.findOne({_id:userID})
+export async function detectIsTyping(io, socket) {
+  socket.io("isTyping", async (data) => {
+    const { userID, roomName, isTyping } = data;
+    const namespace = await NamespaceModel.findOne({ "rooms.title": roomName });
+    const user = await UserModel.findOne({ _id: userID });
 
-    io.of(namespace.href).in(roomName).emit("isTyping",{isTyping,username:user.username})
-  })
+    io.of(namespace.href).in(roomName).emit("isTyping", { isTyping, username: user.username });
+
+    if (!isTyping) {
+      await getRoomOnlineUsers(io, namespace.href, roomName);
+    }
+  });
 }
 
 export async function getRoomOnlineUsers(io, href, roomName) {
@@ -123,29 +127,46 @@ export async function getLocation(io, socket) {
   io.of(namespace.href).in(roomName).emit("confirmLocation", data);
 }
 
-export async function getMedia(io,socket){
-  socket.on("newMedia", async  (data)=>{
-    const {filename,file,sender,roomName} = data;
+export async function getMedia(io, socket) {
+  socket.on("newMedia", async (data) => {
+    const { filename, file, sender, roomName } = data;
 
     const ext = path.extname(filename);
-    const mediaPath = `uploads/${String(Date.now() + ext)}`
+    const mediaPath = `uploads/${String(Date.now() + ext)}`;
 
-     fs.writeFile(`public/${mediaPath}`,file, async (err)=>{
-      if(!err){
+    fs.writeFile(`public/${mediaPath}`, file, async (err) => {
+      if (!err) {
+        await NamespaceModel.updateOne(
+          { _id: namespace._id, "rooms.title": roomName },
+          {
+            $push: {
+              "rooms.$.media": {
+                sender,
+                path: mediaPath,
+              },
+            },
+          },
+        );
 
-        await NamespaceModel.updateOne({_id: namespace._id, "rooms.title": roomName},{
-          $push : {
-            "rooms.$.media":{
-              sender,
-              path: mediaPath
-            }
-          }
-        })
-
-        io.of(namespace.href).in(roomName).emit("confirmMedia",data)
+        io.of(namespace.href).in(roomName).emit("confirmMedia", data);
       }
-    })
+    });
 
-    const namespace = await NamespaceModel.findOne({"rooms.title":roomName})
-  })
+    const namespace = await NamespaceModel.findOne({ "rooms.title": roomName });
+  });
+}
+
+export async function sendPV(io) {
+  io.of("/pv").on("connection", (socket) => {
+    socket.on("joining", (data) => {
+      const { sender, receiver } = data;
+      const prevChat = Array.from(socket.rooms);
+
+      socket.leave(prevChat[1]);
+      socket.leave(prevChat[2]);
+
+      socket.join(`${sender}-${receiver}`);
+      socket.join(`${receiver}-${sender}`);
+    });
+  });
 }
