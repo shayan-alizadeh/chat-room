@@ -14,6 +14,26 @@ const messageSchema = mongoose.Schema(
   },
   { timestamps: true },
 );
+
+const locationSchema = mongoose.Schema(
+  {
+    sender: {
+      type: mongoose.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    x : {
+      type: Number,
+      required: true,
+    },
+    y : {
+      type: Number,
+      required: true,
+    },
+  },
+  { timestamps: true },
+);
+
 const roomSchema = mongoose.Schema(
   {
     title: {
@@ -25,6 +45,10 @@ const roomSchema = mongoose.Schema(
     },
     messages: {
       type: [messageSchema],
+      default: [],
+    },
+    location: {
+      type: [locationSchema],
       default: [],
     },
   },

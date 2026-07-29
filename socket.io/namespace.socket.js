@@ -37,8 +37,6 @@ export async function getNamespaceRoom(io) {
         });
         socket.emit("roomInfo", roomInfo);
 
-        
-
         socket.on("disconnect", async () => {
           await getRoomOnlineUsers(io, namespace.href, newRoom);
         });
@@ -86,4 +84,14 @@ export async function getMessage(io, socket) {
 export async function getRoomOnlineUsers(io, href, roomName) {
   const onlineUsers = await io.of(href).in(roomName).allSockets();
   io.of(href).in(roomName).emit("onlineUsersCount", Array.from(onlineUsers).length);
+}
+
+export async function getLocation(io, socket) {
+  socket.on("newLocation", async (data) => {
+    const { roomName, sender, location } = data;
+  });
+
+  const namespace = await NamespaceModel.findOne({ "rooms.title": roomName });
+
+  io.of(namespace.href).in(roomName).emit("confirmLocation", data);
 }
