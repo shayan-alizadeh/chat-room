@@ -1,4 +1,4 @@
-import { getNamespaceRoom, initConnection } from "./namespace.socket";
+import { getNamespaceRoom, initConnection } from "./namespace.socket.js";
 
 function socketHandler(io) {
   initConnection(io);

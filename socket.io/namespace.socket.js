@@ -1,5 +1,5 @@
-import { NamespaceModel } from "../models/chatModel";
-import { UserModel } from "../models/userModel";
+import { NamespaceModel } from "../models/chatModel.js";
+import { UserModel } from "../models/userModel.js";
 import path from "path"
 import fs from "fs"
 
@@ -86,11 +86,12 @@ export async function getMessage(io, socket) {
 }
 
 export async function detectIsTyping(io,socket){
-  socket.io("isTyping",(data)=>{
+  socket.io("isTyping", async (data)=>{
     const {userID,roomName,isTyping} = data;
     const namespace = await NamespaceModel.findOne({"rooms.title":roomName})
+    const user = await UserModel.findOne({_id:userID})
 
-    io.of(namespace.href).in(roomName).emit("isTyping",{isTyping,username})
+    io.of(namespace.href).in(roomName).emit("isTyping",{isTyping,username:user.username})
   })
 }
 
@@ -123,13 +124,13 @@ export async function getLocation(io, socket) {
 }
 
 export async function getMedia(io,socket){
-  socket.on("newMedia",(data)=>{
+  socket.on("newMedia", async  (data)=>{
     const {filename,file,sender,roomName} = data;
 
     const ext = path.extname(filename);
     const mediaPath = `uploads/${String(Date.now() + ext)}`
 
-    fs.writeFile(`public/${mediaPath}`,file,(err)=>{
+     fs.writeFile(`public/${mediaPath}`,file, async (err)=>{
       if(!err){
 
         await NamespaceModel.updateOne({_id: namespace._id, "rooms.title": roomName},{

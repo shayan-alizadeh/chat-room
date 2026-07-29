@@ -1,4 +1,4 @@
-import { namespaceModel } from "../models/chatModel.js";
+import { NamespaceModel } from "../models/chatModel.js";
 export default class NamespaceController {
   static async getAll(req, res, next) {
     try {

@@ -3,7 +3,7 @@ import app from "./app.js";
 import { Server } from "socket.io";
 import mongoose from "mongoose";
 import "dotenv/config";
-import initConnection from "./socket.io/namespace.socket.js";
+import {initConnection} from "./socket.io/namespace.socket.js";
 import socketHandler from "./socket.io/index.js";
 
 async function connectToDB() {

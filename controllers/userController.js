@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import jwt from "jsonWebToken";
+import jwt from "jsonwebtoken";
 
 export class UserController {
   static async register(req, res, next) {
