@@ -19,7 +19,7 @@ export async function getNamespaceRoom(io) {
       await getMessage(io, socket);
 
       socket.emit("namespaceRooms", mainNamespace.rooms);
-      // single roo
+      // single room
       socket.on("joining", async (newRoom) => {
         const lastRoom = Array.from(socket.rooms)[1];
 
