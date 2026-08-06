@@ -19,7 +19,7 @@ const locationSchema = mongoose.Schema(
   {
     sender: {
       type: mongoose.Types.ObjectId,
-      ref: "User",
+      ref: "",
       required: true,
     },
     x: {
