@@ -16,7 +16,7 @@ export async function getNamespaceRoom(io) {
   const namespaces = await NamespaceModel.find({}).lean();
 
   namespaces.forEach((namespace) => {
-    io.of(namespace.href).on("connection.", async (socket) => {
+    io.of(namespace.href).on("connection", async (socket) => {
       let mainNamespace = await NamespaceModel.findOne({ _id: namespace._id });
 
       await getMessage(io, socket);
