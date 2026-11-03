@@ -8,7 +8,7 @@ export function initConnection(io) {
     socket.broadcast.emit("newMember", "New member joined to room .");
 
     const namespaces = await NamespaceModel.find({}).sort({ _id: -1 });
-    socket.emit("namespaces.", namespaces);
+    socket.emit("namespaces", namespaces);
   });
 }
 
