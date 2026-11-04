@@ -22,7 +22,7 @@ async function startServer() {
   const io = new Server(server, { cors: { origin: "*" } });
   socketHandler(io);
   server.listen(port, () => {
-    console.log(`Server Running on port : ${port}`);
+    console.log(`Server Running on port: ${port}`);
   });
 }
 
