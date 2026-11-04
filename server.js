@@ -9,7 +9,7 @@ import socketHandler from "./socket.io/index.js";
 async function connectToDB() {
   try {
     await mongoose.connect(process.env.MONGO_URI);
-    console.log(`MongoDB Connection : ${mongoose.connection.host}`);
+    console.log(`MongoDB Connection: ${mongoose.connection.host}`);
   } catch (err) {
     console.log(`Error Connection to MongoDB : ${err}`);
     process.exit(1);
